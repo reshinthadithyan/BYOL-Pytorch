@@ -10,4 +10,6 @@ Implementation has both **Notebook version** and also a **.py** version.
 * All the Parameters are contained in ___Params Object___ in the script.
 # Custom Training
 * Change the __Dataset Object__.
-* Update the Required Parameters in the ___Params Object___.
+* Update the Required Parameters in the ___Params Object___.   
+# Feedback
+Any feedback can be raised as an **Issue** and **Pull Requests can be made**.
