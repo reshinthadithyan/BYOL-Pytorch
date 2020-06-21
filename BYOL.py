@@ -9,8 +9,6 @@ import torchvision.models
 import cv2
 import numpy as np
 from tqdm import tqdm
-#import wandb
-#wandb.init(project='byol')
 np.random.seed(0)
 torch.manual_seed(42)
 
@@ -105,7 +103,7 @@ class BYOL:
         self.Target_Net = Target_Net
         self.Predictor  = Predictor
         self.Optim      = Optim
-        #self.Device     = Device
+        self.Device     = Params['Device']
         self.Epochs     = Params['Epochs']
         self.Moment        = Params['M']
         self.Batch_Size = Params['Batch_Size']
@@ -138,10 +136,9 @@ class BYOL:
         for Epoch in range(self.Epochs):
             print("Epoch {}".format(Epoch))
             for (View_1,View_2),_ in tqdm(TrainLoader):
-                View_1 = View_1.to('cuda')
-                View_2 = View_2.to('cuda')
+                View_1 = View_1.to(self.Device)
+                View_2 = View_2.to(self.Device)
                 Loss = self.TrainLoop(View_1,View_2)
-                #wandb.log({"Train Loss": Loss})#print("Regression Loss  :",Loss)
                 self.Optim.zero_grad()
                 Loss.backward()
                 self.Optim.step()
@@ -156,15 +153,16 @@ class BYOL:
 
 #Main
 
-Parameters = {'Epochs':50,'M':0.99,'Batch_Size':64}
+
+Parameters = {'Epochs':50,'M':0.99,'Batch_Size':64,'Device':'cuda','Hidden':512,'Proj':128,'LR':0.03}
 Data_Transforms = Transforms((3,32,32))
 Dataset = datasets.CIFAR10('G:\Work Related\BYOL\Dataset/',download=False,transform=MultiViewDataInjector([Data_Transforms,Data_Transforms]))
-Online_Network = SkeletonNet(512,128)
-Predictor = MLP_Base(Online_Network.Proj.Linear2.out_features,512,128)
-Target_Network = SkeletonNet(512,128)
-Online_Network.to('cuda')
-Predictor.to('cuda')
-Target_Network.to('cuda')
-Optimizer = torch.optim.SGD(list(Online_Network.parameters())+list(Predictor.parameters()),lr=0.03)
+Online_Network = SkeletonNet(Parameters['Hidden'],Parameters['Proj'])
+Predictor = MLP_Base(Online_Network.Proj.Linear2.out_features,Parameters['Hidden'],Parameters['Proj'])
+Target_Network = SkeletonNet(Parameters['Hidden'],Parameters['Proj'])
+Online_Network.to(Parameters['Device'])
+Predictor.to(Parameters['Device'])
+Target_Network.to(Parameters['Device'])
+Optimizer = torch.optim.SGD(list(Online_Network.parameters())+list(Predictor.parameters()),lr=Parameters['LR'])
 Trainer = BYOL(Online_Network,Target_Network,Predictor,Optimizer,Parameters)
 Trainer.Train(Dataset)
