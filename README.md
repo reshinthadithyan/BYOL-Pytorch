@@ -3,4 +3,4 @@ Simple Pytorch Implementation of BYOL: Bootstrap Your Own Latent: A New Approach
 Major part of Code is inspired from https://github.com/sthalles/PyTorch-BYOL and more appropriate Naming Convention is followed.  
    
 # Contents
-Implementation has both Notebook version and also a single Python File version.
+Implementation has both**Notebook version**and also a**Python**File version.   
