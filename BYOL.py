@@ -134,16 +134,19 @@ class BYOL:
         TrainLoader = torch.utils.data.DataLoader(Trainset,batch_size=self.Batch_Size,drop_last=False,shuffle=True)
         self.Init_Target_Network()
         for Epoch in range(self.Epochs):
-            print("Epoch {}".format(Epoch))
-            for (View_1,View_2),_ in tqdm(TrainLoader):
-                View_1 = View_1.to(self.Device)
-                View_2 = View_2.to(self.Device)
-                Loss = self.TrainLoop(View_1,View_2)
-                self.Optim.zero_grad()
-                Loss.backward()
-                self.Optim.step()
-                self.Update_Target_Params()
-            print("Epoch{} Loss:{} : ".format(Epoch,Loss.item()))
+          Loss_Count = 0.0
+          print("Epoch {}".format(Epoch))
+          for (View_1,View_2),_ in tqdm(TrainLoader):
+              View_1 = View_1.to(self.Device)
+              View_2 = View_2.to(self.Device)
+              Loss = self.TrainLoop(View_1,View_2)
+              Loss_Count += Loss.item()
+              self.Optim.zero_grad()
+              Loss.backward()
+              self.Optim.step()
+              self.Update_Target_Params()
+          Epoch_Loss = Loss_Count/len(TrainLoader)
+          print("Epoch{} Loss:{} : ".format(Epoch,Epoch_Loss))
         self.Save(self.Save_Path)
     def Save(self,Save):
         torch.save({'Online_Net':self.Online_Net.state_dict(),
