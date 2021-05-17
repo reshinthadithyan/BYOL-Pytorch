@@ -116,7 +116,7 @@ class BYOL:
     def Loss(Rep1,Rep2):
         Norm_Rep1 = F.normalize(Rep1,dim=-1,p=2) #L2-Normalized Rep One
         Norm_Rep2 = F.normalize(Rep2,dim=-1,p=2) #L2 Normalized Rep Two
-        Loss = -2 * (Norm_Rep1*Norm_Rep2).sum(dim=-1)
+        Loss = 2 -2 * (Norm_Rep1*Norm_Rep2).sum(dim=-1)
         return Loss 
     def Init_Target_Network(self):
         for Param_Online,Param_Target in zip(self.Online_Net.parameters(),self.Target_Net.parameters()):
